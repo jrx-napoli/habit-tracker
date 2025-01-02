@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'app_colors.dart';
+
 
 class HomePage extends StatelessWidget {
   @override
@@ -25,7 +27,7 @@ class HomePage extends StatelessWidget {
                   borderRadius: BorderRadius.circular(20),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.black.withOpacity(0.1), // Shadow color
+                      color: AppColors.dropShadowColor,
                       spreadRadius: 0, // How far the shadow spreads
                       blurRadius: 20, // Softness of the shadow
                       offset: Offset(0, 9), // Position of the shadow (horizontal, vertical)
@@ -35,7 +37,13 @@ class HomePage extends StatelessWidget {
                 child: TextField(
                   decoration: InputDecoration(
                     hintText: "Search",
-                    prefixIcon: Icon(Icons.search, color: Colors.grey),
+                    hintStyle: TextStyle(
+                      fontFamily: 'Inter',
+                      fontSize: 16,
+                      fontWeight: FontWeight.w500,
+                      color: AppColors.lightGrey
+                    ),
+                    prefixIcon: Icon(Icons.search, color: AppColors.lightGrey),
                     filled: true,
                     fillColor: Colors.white, // Match the container's background
                     border: OutlineInputBorder(
@@ -54,33 +62,43 @@ class HomePage extends StatelessWidget {
                   Text(
                     "Today",
                     style: TextStyle(
-                      fontSize: 22,
+                      fontFamily: 'Montserrat',
+                      fontSize: 20,
                       fontWeight: FontWeight.bold,
+                      color: AppColors.darkGrey
                     ),
                   ),
                   TextButton(
                     onPressed: () {}, // Add habit functionality
-                    child: Text("Add habit"),
+                    child: Text(
+                      "Add habit",
+                      style: TextStyle(
+                        fontFamily: 'Inter',
+                        fontSize: 16,
+                        fontWeight: FontWeight.w500,
+                        color: AppColors.lightGrey
+                      ),
+                    ),
                   ),
                 ],
               ),
-              const SizedBox(height: 8),
               Row(
                 children: [
                   _CategoryTab(label: "Health", isSelected: true),
-                  const SizedBox(width: 8),
+                  const SizedBox(width: 20),
                   _CategoryTab(label: "Literature", isSelected: false),
                 ],
               ),
-              const SizedBox(height: 16),
+              const SizedBox(height: 25),
 
               // Habit Cards (Today Section)
               _HabitCard(
                 title: "Drink water",
                 category: "Health",
                 streak: "21 days streak",
-                progress: 0.375, // 3/8
-                color: Colors.blue,
+                progress: 0.375, //
+                colorA: AppColors.blueA,
+                colorB: AppColors.blueB,
               ),
               const SizedBox(height: 16),
               _HabitCard(
@@ -88,7 +106,8 @@ class HomePage extends StatelessWidget {
                 category: "Literature",
                 streak: "13 days streak",
                 progress: 0.5, // 4/8
-                color: Colors.pink,
+                colorA: AppColors.purpleA,
+                colorB: AppColors.purpleB,
               ),
 
               const SizedBox(height: 24),
@@ -97,8 +116,10 @@ class HomePage extends StatelessWidget {
               Text(
                 "This week",
                 style: TextStyle(
-                  fontSize: 22,
+                  fontFamily: 'Montserrat',
+                  fontSize: 20,
                   fontWeight: FontWeight.bold,
+                  color: AppColors.darkGrey
                 ),
               ),
               const SizedBox(height: 16),
@@ -109,7 +130,8 @@ class HomePage extends StatelessWidget {
                 category: "Music",
                 streak: "7 weeks streak",
                 progress: 1.0, // Done
-                color: Colors.orange,
+                colorA: AppColors.pinkA,
+                colorB: AppColors.pinkB,
               ),
               const SizedBox(height: 16),
             ],
@@ -160,16 +182,26 @@ class _CategoryTab extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+      padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 26),
       decoration: BoxDecoration(
-        color: isSelected ? Colors.black : Colors.grey[200],
-        borderRadius: BorderRadius.circular(16),
+        color: isSelected ? AppColors.darkGrey : Colors.white,
+        borderRadius: BorderRadius.circular(20),
+        boxShadow: [
+          BoxShadow(
+            color: AppColors.dropShadowColor,
+            spreadRadius: 0, // How far the shadow spreads
+            blurRadius: 20, // Softness of the shadow
+            offset: Offset(0, 9), // Position of the shadow (horizontal, vertical)
+          ),
+        ]
       ),
       child: Text(
         label,
         style: TextStyle(
-          color: isSelected ? Colors.white : Colors.black,
-          fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+          color: isSelected ? Colors.white : AppColors.lightGrey,
+          fontFamily: 'Inter',
+          fontSize: 16,
+          fontWeight: FontWeight.w500,
         ),
       ),
     );
@@ -182,14 +214,16 @@ class _HabitCard extends StatelessWidget {
   final String category;
   final String streak;
   final double progress;
-  final Color color;
+  final Color colorA;
+  final Color colorB;
 
   const _HabitCard({
     required this.title,
     required this.category,
     required this.streak,
     required this.progress,
-    required this.color,
+    required this.colorA,
+    required this.colorB,
   });
 
   @override
@@ -198,11 +232,19 @@ class _HabitCard extends StatelessWidget {
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         gradient: LinearGradient(
-          colors: [color.withOpacity(0.7), color],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
+          colors: [colorA, colorB],
+          begin: Alignment.centerLeft,
+          end: Alignment.centerRight,
         ),
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(20),
+        boxShadow: [
+          BoxShadow(
+            color: AppColors.dropShadowColor,
+            spreadRadius: 0, // How far the shadow spreads
+            blurRadius: 20, // Softness of the shadow
+            offset: Offset(0, 9), // Position of the shadow (horizontal, vertical)
+          ),
+        ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -211,17 +253,19 @@ class _HabitCard extends StatelessWidget {
           Text(
             title,
             style: const TextStyle(
-              color: Colors.white,
-              fontSize: 18,
-              fontWeight: FontWeight.bold,
+              color: AppColors.darkGrey,
+              fontSize: 16,
+              fontFamily: 'Inter',
+              fontWeight: FontWeight.w700,
             ),
           ),
-          const SizedBox(height: 4),
           Text(
             category,
             style: TextStyle(
-              color: Colors.white70,
+              color: AppColors.darkGrey.withAlpha(150),
               fontSize: 14,
+              fontFamily: 'Inter',
+              fontWeight: FontWeight.w500,
             ),
           ),
           const SizedBox(height: 16),
@@ -230,11 +274,14 @@ class _HabitCard extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
+              Icon(Icons.local_fire_department, color: Colors.white),
               Text(
                 streak,
                 style: const TextStyle(
                   color: Colors.white,
                   fontSize: 14,
+                  fontFamily: 'Inter',
+                  fontWeight: FontWeight.w500,
                 ),
               ),
               Text(
@@ -242,6 +289,8 @@ class _HabitCard extends StatelessWidget {
                 style: const TextStyle(
                   color: Colors.white,
                   fontSize: 14,
+                  fontFamily: 'Inter',
+                  fontWeight: FontWeight.w500,
                 ),
               ),
             ],

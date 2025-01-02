@@ -84,6 +84,19 @@ flutter:
   #       - asset: fonts/TrajanPro.ttf
   #       - asset: fonts/TrajanPro_Bold.ttf
   #         weight: 700
+
+  fonts:
+  - family: Inter
+    fonts:
+      - asset: assets/fonts/Inter-VariableFont_opsz,wght.ttf
+
+  - family: Montserrat
+    fonts:
+      - asset: assets/fonts/Montserrat-VariableFont_wght.ttf
+      - asset: assets/fonts/Montserrat-Bold.ttf
+        weight: 700
+
+
   #
   # For details regarding fonts from package dependencies,
   # see https://flutter.dev/to/font-from-package
