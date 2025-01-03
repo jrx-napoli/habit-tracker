@@ -2,17 +2,18 @@ import 'package:flutter/material.dart';
 
 // Define all your custom colors here
 class AppColors {
-  static const Color dropShadowColor = Color.fromARGB(25, 0, 0, 0); // Semi-transparent black
+  static const Color dropShadowColor = Color.fromARGB(25, 0, 0, 0);
   static const Color lightGrey = Color.fromARGB(255, 156, 156, 156);
   static const Color darkGrey = Color.fromARGB(255, 31, 31, 31);
 
   // gradients
-  static const Color blueA = Color.fromARGB(255, 202, 187, 192);
-  static const Color blueB = Color.fromARGB(255, 198, 229, 253);
 
-  static const Color purpleA = Color.fromARGB(255, 179, 189, 240);
-  static const Color purpleB = Color.fromARGB(255, 218, 140, 163);
+  static const Color blueA = Color.fromARGB(140, 137, 105, 115);
+  static const Color blueB = Color.fromARGB(140, 141, 204, 252);
 
-  static const Color pinkA = Color.fromARGB(255, 255, 136, 188);
-  static const Color pinkB = Color.fromARGB(255, 251, 204, 148);
+  static const Color purpleA = Color.fromARGB(140, 104, 124, 226);
+  static const Color purpleB = Color.fromARGB(140, 182, 25, 71);
+
+  static const Color pinkA = Color.fromARGB(140, 255, 15, 123);
+  static const Color pinkB = Color.fromARGB(140, 248, 155, 41);
 }

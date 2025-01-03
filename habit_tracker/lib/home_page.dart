@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
+
 import 'app_colors.dart';
+import 'nav_bar.dart';
 
 
 class HomePage extends StatelessWidget {
@@ -13,7 +16,7 @@ class HomePage extends StatelessWidget {
         toolbarHeight: 0, // Removes the default app bar space
       ),
       body: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16.0),
+        padding: const EdgeInsets.symmetric(horizontal: 25.0),
         child: SingleChildScrollView(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -96,7 +99,9 @@ class HomePage extends StatelessWidget {
                 title: "Drink water",
                 category: "Health",
                 streak: "21 days streak",
-                progress: 0.375, //
+                progress: 3, //
+                goal: 8,
+                status: "3/8",
                 colorA: AppColors.blueA,
                 colorB: AppColors.blueB,
               ),
@@ -105,7 +110,9 @@ class HomePage extends StatelessWidget {
                 title: "Read",
                 category: "Literature",
                 streak: "13 days streak",
-                progress: 0.5, // 4/8
+                progress: 0,
+                goal: 1,
+                status: "Pending",
                 colorA: AppColors.purpleA,
                 colorB: AppColors.purpleB,
               ),
@@ -129,7 +136,9 @@ class HomePage extends StatelessWidget {
                 title: "Practice piano",
                 category: "Music",
                 streak: "7 weeks streak",
-                progress: 1.0, // Done
+                progress: 1,
+                goal: 1,
+                status: "Done",
                 colorA: AppColors.pinkA,
                 colorB: AppColors.pinkB,
               ),
@@ -139,31 +148,14 @@ class HomePage extends StatelessWidget {
         ),
       ),
 
-      // Bottom Navigation Bar
-      bottomNavigationBar: BottomNavigationBar(
-        items: const [
-          BottomNavigationBarItem(
-            icon: Icon(Icons.home),
-            label: "Home",
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.explore),
-            label: "Explore",
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.analytics),
-            label: "Analytics",
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.settings),
-            label: "Settings",
-          ),
-        ],
-        currentIndex: 0, // Home is selected
-        onTap: (index) {
-          // Handle navigation
-        },
-        type: BottomNavigationBarType.fixed,
+
+      bottomNavigationBar: CustomNavigationBar(
+        currentIndex: 0,
+        // onTap: (index) {
+        //   setState(() {
+        //     currentIndex = index; // Update the selected index
+        //   });
+        // },
       ),
     );
   }
@@ -214,6 +206,8 @@ class _HabitCard extends StatelessWidget {
   final String category;
   final String streak;
   final double progress;
+  final int goal;
+  final String status;
   final Color colorA;
   final Color colorB;
 
@@ -222,6 +216,8 @@ class _HabitCard extends StatelessWidget {
     required this.category,
     required this.streak,
     required this.progress,
+    required this.goal,
+    required this.status,
     required this.colorA,
     required this.colorB,
   });
@@ -229,7 +225,7 @@ class _HabitCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
         gradient: LinearGradient(
           colors: [colorA, colorB],
@@ -250,14 +246,22 @@ class _HabitCard extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           // Habit title and category
-          Text(
-            title,
-            style: const TextStyle(
-              color: AppColors.darkGrey,
-              fontSize: 16,
-              fontFamily: 'Inter',
-              fontWeight: FontWeight.w700,
-            ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                title,
+                style: const TextStyle(
+                  color: AppColors.darkGrey,
+                  fontSize: 16,
+                  fontFamily: 'Inter',
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+              HeartIcon(
+                color: colorB.withAlpha(255),
+              ),
+            ],
           ),
           Text(
             category,
@@ -274,18 +278,23 @@ class _HabitCard extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Icon(Icons.local_fire_department, color: Colors.white),
-              Text(
-                streak,
-                style: const TextStyle(
-                  color: Colors.white,
-                  fontSize: 14,
-                  fontFamily: 'Inter',
-                  fontWeight: FontWeight.w500,
-                ),
+              Row(
+                children: [
+                  FlameIcon(),
+                  SizedBox(width: 8), // 20 pixels of space
+                  Text(
+                    streak,
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 14,
+                      fontFamily: 'Inter',
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ],
               ),
               Text(
-                "${(progress * 8).toInt()}/8",
+                status,
                 style: const TextStyle(
                   color: Colors.white,
                   fontSize: 14,
@@ -297,11 +306,45 @@ class _HabitCard extends StatelessWidget {
           ),
           const SizedBox(height: 8),
           LinearProgressIndicator(
-            value: progress,
+            value: progress / goal,
             backgroundColor: Colors.white38,
             valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
           ),
         ],
+      ),
+    );
+  }
+}
+
+class FlameIcon extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: SvgPicture.asset(
+        'assets/icons/flame_icon.svg',
+        width: 18,  // Set icon size
+        height: 22,
+        color: Colors.white, // Optional: Tint the icon
+      ),
+    );
+  }
+}
+
+class HeartIcon extends StatelessWidget {
+    final Color color;
+
+  const HeartIcon({
+    required this.color,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: SvgPicture.asset(
+        'assets/icons/heart_icon.svg',
+        width: 24,  // Set icon size
+        height: 24,
+        color: color, // Optional: Tint the icon
       ),
     );
   }
