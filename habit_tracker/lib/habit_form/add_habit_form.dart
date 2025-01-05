@@ -2,6 +2,12 @@ import 'dart:ui'; // Required for the blur effect
 import 'package:flutter/material.dart';
 
 import 'package:habit_tracker/constants/app_colors.dart';
+import 'input_field.dart';
+import 'frequency_field.dart';
+import 'target_field.dart';
+import 'notifications_field.dart';
+import 'notes_field.dart';
+
 
 class AddHabitForm extends StatelessWidget {
   const AddHabitForm({super.key});
@@ -87,9 +93,9 @@ class AddHabitForm extends StatelessWidget {
                           ),
                           child: Column(
                             children: [
-                              _buildInputField("Activity"),
+                              InputField(label: "Activity"),
                               SizedBox(height: 10),
-                              _buildInputField("Category"),
+                              InputField(label: "Category"),
                             ],
                           )
                         ),
@@ -101,16 +107,16 @@ class AddHabitForm extends StatelessWidget {
                           ),
                           child: Column(
                             children: [
-                              _buildFrequencyField(),
+                              FrequencyField(),
                               SizedBox(height: 10),
-                              _buildTargetField(),
+                              TargetField(),
                               SizedBox(height: 10),
-                              _buildNotificationsField(),
+                              NotificationsField(),
                             ],
                           )
                         ),
                         SizedBox(height: 20),
-                        _buildNotesField(),
+                        NotesField(),
                       ],
                     ),
                   ),
@@ -120,231 +126,6 @@ class AddHabitForm extends StatelessWidget {
           ],
         );
       },
-    );
-  }
-
-  Widget _buildInputField(String label) {
-    return Container(
-      decoration: BoxDecoration(
-        boxShadow: [
-          BoxShadow(
-            color: AppColors.dropShadowColor,
-            spreadRadius: 0,
-            blurRadius: 20,
-            offset: Offset(0, 9),
-          ),
-        ],
-      ),
-      child: TextField(
-        decoration: InputDecoration(
-          labelStyle: TextStyle(
-            fontFamily: 'Inter',
-            fontSize: 16,
-            fontWeight: FontWeight.w500,
-            color: AppColors.lightGrey
-          ),
-          contentPadding: EdgeInsets.only(left: 20, right: 20, top: 15, bottom: 15),
-          labelText: label,
-          filled: true,
-          fillColor: Colors.white,
-          border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(20),
-            borderSide: BorderSide.none,
-          ),
-        ),
-      )
-    ); 
-  }
-
-  Widget _buildFrequencyField() {
-    return Container(
-      padding: EdgeInsets.only(left: 20, right: 20),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(20),
-        boxShadow: [
-          BoxShadow(
-            color: AppColors.dropShadowColor,
-            spreadRadius: 0,
-            blurRadius: 20,
-            offset: Offset(0, 9),
-          ),
-        ],
-      ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Padding(
-            padding: EdgeInsets.only(top: 15, bottom: 15),
-            child: Text(
-              "Frequency",
-              style: TextStyle(
-                fontFamily: 'Inter',
-                fontSize: 16,
-                fontWeight: FontWeight.w500,
-                color: AppColors.darkGrey
-              ),
-            ),
-          ),
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
-            decoration: BoxDecoration(
-              color: AppColors.lightGrey,
-              borderRadius: BorderRadius.circular(20),
-            ),
-            child: Text(
-              'Daily',
-              style: TextStyle(
-                fontFamily: 'Inter',
-                fontSize: 16,
-                color: Colors.white,
-                fontWeight: FontWeight.w500),
-            ),
-          ),
-        ],
-      )
-    ); 
-  }
-
-  Widget _buildTargetField() {
-    return Container(
-      padding: EdgeInsets.only(left: 20, right: 20),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(20),
-        boxShadow: [
-          BoxShadow(
-            color: AppColors.dropShadowColor,
-            spreadRadius: 0,
-            blurRadius: 20,
-            offset: Offset(0, 9),
-          ),
-        ],
-      ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Padding(
-            padding: EdgeInsets.only(top: 15, bottom: 15),
-            child: Text(
-              "Target",
-              style: TextStyle(
-                fontFamily: 'Inter',
-                fontSize: 16,
-                fontWeight: FontWeight.w500,
-                color: AppColors.darkGrey
-              ),
-            ),
-          ),
-          Row(
-            children: [
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
-                decoration: BoxDecoration(
-                  color: AppColors.lightGrey,
-                  borderRadius: BorderRadius.circular(20),
-                ),
-                child: Text(
-                  'Reach count',
-                  style: TextStyle(
-                    fontFamily: 'Inter',
-                    fontSize: 16,
-                    color: Colors.white,
-                    fontWeight: FontWeight.w500),
-                ),
-              ),
-              SizedBox(width: 10),
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
-                decoration: BoxDecoration(
-                  color: AppColors.lightGrey,
-                  borderRadius: BorderRadius.circular(20),
-                ),
-                child: Text(
-                  '2',
-                  style: TextStyle(
-                    fontFamily: 'Inter',
-                    fontSize: 16,
-                    color: Colors.white,
-                    fontWeight: FontWeight.w500
-                  ),
-                ),
-              ),
-            ],  
-          ),
-        ],
-      )
-    ); 
-  }
-
-  Widget _buildNotificationsField() {
-    return Container(
-      padding: EdgeInsets.only(left: 20, right: 20),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(20),
-        boxShadow: [
-          BoxShadow(
-            color: AppColors.dropShadowColor,
-            spreadRadius: 0,
-            blurRadius: 20,
-            offset: Offset(0, 9),
-          ),
-        ],
-      ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Padding(
-            padding: EdgeInsets.only(top: 15, bottom: 15),
-            child: Text(
-              "Notifications",
-              style: TextStyle(
-                fontFamily: 'Inter',
-                fontSize: 16,
-                fontWeight: FontWeight.w500,
-                color: AppColors.darkGrey
-              ),
-            ),
-          ),
-          Switch(value: false, onChanged: (value) {}),
-        ],
-      )
-    ); 
-  }
-
-  Widget _buildNotesField() {
-    return Container(
-      decoration: BoxDecoration(
-        boxShadow: [
-          BoxShadow(
-            color: AppColors.dropShadowColor,
-            spreadRadius: 0,
-            blurRadius: 20,
-            offset: Offset(0, 9),
-          ),
-        ],
-      ),
-      child: TextField(
-        maxLines: 5,
-        decoration: InputDecoration(
-          labelStyle: TextStyle(
-            fontFamily: 'Inter',
-            fontSize: 16,
-            fontWeight: FontWeight.w500,
-            color: AppColors.lightGrey
-          ),
-          contentPadding: EdgeInsets.only(left: 20, right: 20, top: 15, bottom: 15),
-          labelText: 'Notes',
-          alignLabelWithHint: true,
-          filled: true,
-          fillColor: Colors.white,
-          border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(20),
-            borderSide: BorderSide.none,
-          ),
-        ),
-      )
     );
   }
 }
