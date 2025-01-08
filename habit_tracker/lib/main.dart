@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'home_page/home_page.dart';
 import 'nav_bar.dart';
 
-
 void main() {
   runApp(MyApp());
 }
@@ -15,7 +14,7 @@ class MyApp extends StatefulWidget {
 }
 
 class MyAppState extends State<MyApp> {
-  int currentIndex = 0; // index of current page 
+  int currentIndex = 0; // index of current page
 
   // Pages for each tab
   final List<Widget> pages = [
@@ -41,7 +40,7 @@ class MyAppState extends State<MyApp> {
             setState(() {
               currentIndex = index;
             });
-          },  
+          },
         ),
       ),
     );

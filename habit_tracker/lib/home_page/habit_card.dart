@@ -4,20 +4,20 @@ import 'package:flutter_svg/flutter_svg.dart';
 import '../constants/app_colors.dart';
 import '../habit_form/edit_habit_form.dart';
 
-
 // Widget for Habit Cards
 class HabitCard extends StatelessWidget {
   final String title;
   final String category;
   final String streak;
-  final double progress;
+  final int progress;
   final int goal;
   final String status;
   final Color colorA;
   final Color colorB;
+  final void Function(int change) onProgressChange;
 
   const HabitCard({
-    super.key, 
+    super.key,
     required this.title,
     required this.category,
     required this.streak,
@@ -26,116 +26,152 @@ class HabitCard extends StatelessWidget {
     required this.status,
     required this.colorA,
     required this.colorB,
+    required this.onProgressChange,
   });
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onLongPress: () {
-        showModalBottomSheet(
-          context: context,
-          isScrollControlled: true, // Allows the modal to expand fully
-          backgroundColor: Colors.transparent, 
-          barrierColor: Colors.transparent,// Makes the modal background transparent
-          builder: (context) {
-            return EditHabitForm();
+    return ClipRRect(
+        borderRadius: BorderRadius.circular(20),
+        child: Dismissible(
+          key: Key(title),
+          direction: DismissDirection.horizontal,
+          confirmDismiss: (direction) async {
+            if (direction == DismissDirection.startToEnd) {
+              // Swiped right -> Decrease progress
+              onProgressChange(-1);
+            } else if (direction == DismissDirection.endToStart) {
+              // Swiped left -> Increase progress
+              onProgressChange(1);
+            }
+            // Return false to prevent full dismissal
+            return false;
           },
-        );
-      },
-
-      child: Container(
-        padding: const EdgeInsets.all(20),
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            colors: [colorA, colorB],
-            begin: Alignment.centerLeft,
-            end: Alignment.centerRight,
+          background: Container(
+            decoration: BoxDecoration(
+                // borderRadius: BorderRadius.circular(20),
+                color: colorA.withAlpha(200)),
+            alignment: Alignment.centerLeft,
+            padding: const EdgeInsets.only(left: 20),
+            child: Icon(Icons.remove,
+                color: Colors.white, size: 32), // Icon for swipe right
           ),
-          borderRadius: BorderRadius.circular(20),
-          boxShadow: [
-            BoxShadow(
-              color: AppColors.dropShadowColor,
-              spreadRadius: 0,
-              blurRadius: 20,
-              offset: Offset(0, 9), // (horizontal, vertical)
+          secondaryBackground: Container(
+            decoration: BoxDecoration(
+              // borderRadius: BorderRadius.circular(20),
+              color: colorB.withAlpha(200),
             ),
-          ],
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            
-            // Habit title and category
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  title,
-                  style: const TextStyle(
-                    color: AppColors.darkGrey,
-                    fontSize: 16,
-                    fontFamily: 'Inter',
-                    fontWeight: FontWeight.w700,
+            alignment: Alignment.centerRight,
+            padding: const EdgeInsets.only(right: 20),
+            child: Icon(Icons.add,
+                color: Colors.white, size: 32), // Icon for swipe left
+          ),
+          child: GestureDetector(
+            onLongPress: () {
+              showModalBottomSheet(
+                context: context,
+                isScrollControlled: true, // Allows the modal to expand fully
+                backgroundColor: Colors.transparent,
+                barrierColor: Colors
+                    .transparent, // Makes the modal background transparent
+                builder: (context) {
+                  return EditHabitForm();
+                },
+              );
+            },
+            child: Container(
+              padding: const EdgeInsets.all(20),
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  colors: [colorA, colorB],
+                  begin: Alignment.centerLeft,
+                  end: Alignment.centerRight,
+                ),
+                // borderRadius: BorderRadius.circular(20),
+                boxShadow: [
+                  BoxShadow(
+                    color: AppColors.dropShadowColor,
+                    spreadRadius: 0,
+                    blurRadius: 20,
+                    offset: Offset(0, 9), // (horizontal, vertical)
                   ),
-                ),
-                HeartIcon(
-                  color: colorB.withAlpha(255),
-                ),
-              ],
-            ),
-            Text(
-              category,
-              style: TextStyle(
-                color: AppColors.darkGrey.withAlpha(150),
-                fontSize: 14,
-                fontFamily: 'Inter',
-                fontWeight: FontWeight.w500,
+                ],
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Habit title and category
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        title,
+                        style: const TextStyle(
+                          color: AppColors.darkGrey,
+                          fontSize: 16,
+                          fontFamily: 'Inter',
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                      HeartIcon(
+                        color: colorB.withAlpha(255),
+                      ),
+                    ],
+                  ),
+                  Text(
+                    category,
+                    style: TextStyle(
+                      color: AppColors.darkGrey.withAlpha(150),
+                      fontSize: 14,
+                      fontFamily: 'Inter',
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+
+                  // Streak and Progress Bar
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Row(
+                        children: [
+                          FlameIcon(),
+                          SizedBox(width: 8), // 20 pixels of space
+                          Text(
+                            streak,
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 14,
+                              fontFamily: 'Inter',
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                        ],
+                      ),
+                      Text(
+                        status,
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 14,
+                          fontFamily: 'Inter',
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 8),
+
+                  // Progress bar
+                  LinearProgressIndicator(
+                    value: progress / goal,
+                    backgroundColor: Colors.white38,
+                    valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                  ),
+                ],
               ),
             ),
-            const SizedBox(height: 16),
-
-            // Streak and Progress Bar
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Row(
-                  children: [
-                    FlameIcon(),
-                    SizedBox(width: 8), // 20 pixels of space
-                    Text(
-                      streak,
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 14,
-                        fontFamily: 'Inter',
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                  ],
-                ),
-                Text(
-                  status,
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 14,
-                    fontFamily: 'Inter',
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 8),
-            
-            // Progress bar
-            LinearProgressIndicator(
-              value: progress / goal,
-              backgroundColor: Colors.white38,
-              valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
-            ),
-          ],
-        ),
-      ),
-    );
+          ),
+        ));
   }
 }
 
@@ -147,19 +183,19 @@ class FlameIcon extends StatelessWidget {
     return Center(
       child: SvgPicture.asset(
         'assets/icons/flame_icon.svg',
-        width: 18,  // Set icon size
+        width: 18,
         height: 22,
-        color: Colors.white, // Optional: Tint the icon
+        color: Colors.white,
       ),
     );
   }
 }
 
 class HeartIcon extends StatelessWidget {
-    final Color color;
+  final Color color;
 
   const HeartIcon({
-    super.key, 
+    super.key,
     required this.color,
   });
 
@@ -168,9 +204,9 @@ class HeartIcon extends StatelessWidget {
     return Center(
       child: SvgPicture.asset(
         'assets/icons/heart_icon.svg',
-        width: 24,  // Set icon size
+        width: 24,
         height: 24,
-        color: color, // Optional: Tint the icon
+        color: color,
       ),
     );
   }
