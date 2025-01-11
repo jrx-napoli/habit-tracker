@@ -1,16 +1,19 @@
 import 'package:flutter/material.dart';
-
-import '../constants/app_colors.dart';
-
+import 'package:habit_tracker/constants/app_colors.dart';
 
 class FrequencyField extends StatelessWidget {
+  final String selectedFrequency;
+  final ValueChanged<String> onChanged;
 
-  const FrequencyField({super.key});
+  const FrequencyField({
+    super.key,
+    required this.selectedFrequency,
+    required this.onChanged,
+  });
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: EdgeInsets.only(left: 20, right: 20),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(20),
@@ -19,42 +22,40 @@ class FrequencyField extends StatelessWidget {
             color: AppColors.dropShadowColor,
             spreadRadius: 0,
             blurRadius: 20,
-            offset: Offset(0, 9),
+            offset: const Offset(0, 9),
           ),
         ],
       ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Padding(
-            padding: EdgeInsets.only(top: 15, bottom: 15),
-            child: Text(
-              "Frequency",
-              style: TextStyle(
-                fontFamily: 'Inter',
-                fontSize: 16,
-                fontWeight: FontWeight.w500,
-                color: AppColors.darkGrey
-              ),
-            ),
+      child: DropdownButtonFormField<String>(
+        dropdownColor: Colors.white,
+        borderRadius: BorderRadius.circular(20),
+        style: TextStyle(
+          fontFamily: 'Inter',
+          fontSize: 16,
+          fontWeight: FontWeight.w500,
+          color: AppColors.darkGrey,
+        ),
+        value: selectedFrequency,
+        decoration: InputDecoration(
+          contentPadding: const EdgeInsets.symmetric(
+            vertical: 15,
+            horizontal: 20,
           ),
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
-            decoration: BoxDecoration(
-              color: AppColors.lightGrey,
-              borderRadius: BorderRadius.circular(20),
-            ),
-            child: Text(
-              'Daily',
-              style: TextStyle(
-                fontFamily: 'Inter',
-                fontSize: 16,
-                color: Colors.white,
-                fontWeight: FontWeight.w500),
-            ),
-          ),
-        ],
-      )
-    ); 
+          labelText: null,
+          border: InputBorder.none,
+        ),
+        items: ["Daily", "Weekly", "Monthly"]
+            .map((freq) => DropdownMenuItem(
+                  value: freq,
+                  child: Text(freq),
+                ))
+            .toList(),
+        onChanged: (value) {
+          if (value != null) {
+            onChanged(value);
+          }
+        },
+      ),
+    );
   }
 }

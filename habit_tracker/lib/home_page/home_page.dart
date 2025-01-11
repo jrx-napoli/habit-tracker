@@ -45,16 +45,6 @@ class HomePageState extends State<HomePage> {
       "colorA": AppColors.pinkA,
       "colorB": AppColors.pinkB,
     },
-    // {
-    //   "title": "Go for a run",
-    //   "category": "Health",
-    //   "streak": "3 days streak",
-    //   "progress": 2,
-    //   "goal": 3,
-    //   "status": "2/3",
-    //   "colorA": AppColors.orangeA,
-    //   "colorB": AppColors.orangeB,
-    // }
   ];
 
   String selectedCategory = "All"; // Track the selected category
