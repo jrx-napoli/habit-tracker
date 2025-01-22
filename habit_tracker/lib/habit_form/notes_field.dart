@@ -3,7 +3,9 @@ import 'package:flutter/material.dart';
 import '../constants/app_colors.dart';
 
 class NotesField extends StatelessWidget {
-  const NotesField({super.key});
+  final TextEditingController? controller;
+
+  const NotesField({super.key, this.controller});
 
   @override
   Widget build(BuildContext context) {
@@ -19,6 +21,7 @@ class NotesField extends StatelessWidget {
           ],
         ),
         child: TextField(
+          controller: controller,
           maxLines: 5,
           style: TextStyle(
             fontFamily: 'Inter',

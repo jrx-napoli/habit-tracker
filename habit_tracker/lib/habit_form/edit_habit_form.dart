@@ -8,8 +8,19 @@ import 'package:habit_tracker/habit_form/target_field.dart';
 import 'input_field.dart';
 import 'notes_field.dart';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+
 class EditHabitForm extends StatefulWidget {
-  const EditHabitForm({super.key});
+  final String habitId;
+  final String title;
+  final String category;
+
+  const EditHabitForm(
+      {super.key,
+      required this.habitId,
+      required this.title,
+      required this.category});
 
   @override
   State<EditHabitForm> createState() => _EditHabitFormState();
@@ -20,8 +31,37 @@ class _EditHabitFormState extends State<EditHabitForm> {
   String selectedTarget = "Complete"; // Default target value
   int? reachCount; // Store the numerical value for "Reach Count"
 
+  final TextEditingController activityController = TextEditingController();
+  final TextEditingController categoryController = TextEditingController();
+  final TextEditingController notesController = TextEditingController();
+  final TextEditingController reachCountController = TextEditingController();
+
+  final FirebaseFirestore firestore = FirebaseFirestore.instance;
+  final FirebaseAuth auth = FirebaseAuth.instance;
+
+  Future<void> deleteHabit(String habitId) async {
+    try {
+      final User? user = auth.currentUser;
+      if (user == null) throw Exception("User not logged in");
+
+      await firestore
+          .collection('users')
+          .doc(user.uid)
+          .collection('habits')
+          .doc(habitId)
+          .delete();
+
+      print("Habit deleted successfully!");
+    } catch (e) {
+      print("Error deleting habit: $e");
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
+    activityController.text = widget.title;
+    categoryController.text = widget.category;
+
     return DraggableScrollableSheet(
       initialChildSize: 0.9,
       maxChildSize: 0.9, // Expandable up to 90%
@@ -105,9 +145,15 @@ class _EditHabitFormState extends State<EditHabitForm> {
                           ),
                           child: Column(
                             children: [
-                              InputField(label: "Activity"),
+                              InputField(
+                                label: "Activity",
+                                controller: activityController,
+                              ),
                               const SizedBox(height: 10),
-                              InputField(label: "Category"),
+                              InputField(
+                                label: "Category",
+                                controller: categoryController,
+                              ),
                             ],
                           ),
                         ),
@@ -165,7 +211,13 @@ class _EditHabitFormState extends State<EditHabitForm> {
 
                         const SizedBox(height: 20),
 
-                        DeleteButton()
+                        GestureDetector(
+                          onTap: () {
+                            deleteHabit(widget.habitId);
+                            Navigator.of(context).pop();
+                          },
+                          child: DeleteButton(),
+                        )
                       ],
                     ),
                   ),

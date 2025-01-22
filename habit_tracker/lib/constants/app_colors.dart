@@ -18,4 +18,13 @@ class AppColors {
 
   static const Color pinkA = Color.fromARGB(140, 255, 15, 123);
   static const Color pinkB = Color.fromARGB(140, 248, 155, 41);
+
+  static const List<Color> gradients = [
+    blueA,
+    blueB,
+    purpleA,
+    purpleB,
+    pinkA,
+    pinkB
+  ];
 }

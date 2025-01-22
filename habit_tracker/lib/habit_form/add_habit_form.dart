@@ -7,6 +7,9 @@ import 'package:habit_tracker/habit_form/target_field.dart';
 import 'input_field.dart';
 import 'notes_field.dart';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+
 class AddHabitForm extends StatefulWidget {
   const AddHabitForm({super.key});
 
@@ -18,6 +21,32 @@ class _AddHabitFormState extends State<AddHabitForm> {
   String selectedFrequency = "Daily"; // Default frequency value
   String selectedTarget = "Complete"; // Default target value
   int? reachCount; // Store the numerical value for "Reach Count"
+
+  final TextEditingController activityController = TextEditingController();
+  final TextEditingController categoryController = TextEditingController();
+  final TextEditingController notesController = TextEditingController();
+  final TextEditingController reachCountController = TextEditingController();
+
+  final FirebaseFirestore firestore = FirebaseFirestore.instance;
+  final FirebaseAuth auth = FirebaseAuth.instance;
+
+  Future<void> addHabit(Map<String, dynamic> habitData) async {
+    try {
+      // Get the current user's UID
+      final User? user = auth.currentUser;
+      if (user == null) throw Exception("User not logged in");
+
+      // Add the habit to the user's habits collection
+      await firestore
+          .collection('users')
+          .doc(user.uid)
+          .collection('habits')
+          .add(habitData);
+      print("Habit added successfully!");
+    } catch (e) {
+      print("Error adding habit: $e");
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -72,8 +101,30 @@ class _AddHabitFormState extends State<AddHabitForm> {
                         ),
                       ),
                       TextButton(
-                        onPressed: () {
-                          // Add habit logic here
+                        onPressed: () async {
+                          // Collect data from input fields
+                          final habitData = {
+                            "activity": activityController.text,
+                            "category": categoryController.text,
+                            "frequency": selectedFrequency,
+                            "targetType": selectedTarget,
+                            "reachCount": selectedTarget == "Reach count"
+                                ? int.tryParse(reachCountController.text) ?? 0
+                                : null,
+                            "notes": notesController.text,
+                            "progress": 0,
+                            "goal": selectedTarget == "Complete"
+                                ? 1
+                                : int.parse(reachCountController.text),
+                            "createdAt": FieldValue.serverTimestamp(),
+                            "isFavorite": false,
+                            "streak": 0
+                          };
+
+                          // Save the habit to Firestore
+                          await addHabit(habitData);
+
+                          // Close the modal
                           Navigator.of(context).pop(); // Close the modal
                         },
                         child: Text(
@@ -104,9 +155,15 @@ class _AddHabitFormState extends State<AddHabitForm> {
                           ),
                           child: Column(
                             children: [
-                              InputField(label: "Activity"),
+                              InputField(
+                                label: "Activity",
+                                controller: activityController,
+                              ),
                               const SizedBox(height: 10),
-                              InputField(label: "Category"),
+                              InputField(
+                                label: "Category",
+                                controller: categoryController,
+                              ),
                             ],
                           ),
                         ),
@@ -146,7 +203,10 @@ class _AddHabitFormState extends State<AddHabitForm> {
                                 Column(
                                   children: [
                                     const SizedBox(height: 10),
-                                    InputField(label: "Count")
+                                    InputField(
+                                      label: "Count",
+                                      controller: reachCountController,
+                                    )
                                   ],
                                 ),
 
@@ -160,7 +220,9 @@ class _AddHabitFormState extends State<AddHabitForm> {
                         const SizedBox(height: 20),
 
                         // Notes Field
-                        NotesField(),
+                        NotesField(
+                          controller: notesController,
+                        ),
                       ],
                     ),
                   ),

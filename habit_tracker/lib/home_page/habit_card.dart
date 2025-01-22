@@ -4,8 +4,8 @@ import 'package:flutter_svg/flutter_svg.dart';
 import '../constants/app_colors.dart';
 import '../habit_form/edit_habit_form.dart';
 
-// Widget for Habit Cards
 class HabitCard extends StatelessWidget {
+  final String id;
   final String title;
   final String category;
   final String streak;
@@ -15,9 +15,12 @@ class HabitCard extends StatelessWidget {
   final Color colorA;
   final Color colorB;
   final void Function(int change) onProgressChange;
+  final bool isFavorite; // Added property to indicate favorite state
+  final VoidCallback onFavoriteToggle; // Added callback for toggling favorite
 
   const HabitCard({
     super.key,
+    required this.id,
     required this.title,
     required this.category,
     required this.streak,
@@ -27,6 +30,8 @@ class HabitCard extends StatelessWidget {
     required this.colorA,
     required this.colorB,
     required this.onProgressChange,
+    required this.isFavorite, // Initialize isFavorite
+    required this.onFavoriteToggle, // Initialize onFavoriteToggle
   });
 
   @override
@@ -75,7 +80,11 @@ class HabitCard extends StatelessWidget {
                 barrierColor: Colors
                     .transparent, // Makes the modal background transparent
                 builder: (context) {
-                  return EditHabitForm();
+                  return EditHabitForm(
+                    habitId: id,
+                    title: title,
+                    category: category,
+                  );
                 },
               );
             },
@@ -113,8 +122,13 @@ class HabitCard extends StatelessWidget {
                           fontWeight: FontWeight.w700,
                         ),
                       ),
-                      HeartIcon(
-                        color: colorB.withAlpha(255),
+                      GestureDetector(
+                        onTap: onFavoriteToggle, // Handle tap
+                        child: HeartIcon(
+                          isFilled:
+                              isFavorite, // Update based on favorite state
+                          color: colorB.withAlpha(255),
+                        ),
                       ),
                     ],
                   ),
@@ -192,10 +206,12 @@ class FlameIcon extends StatelessWidget {
 }
 
 class HeartIcon extends StatelessWidget {
+  final bool isFilled; // Added property to determine filled or outlined
   final Color color;
 
   const HeartIcon({
     super.key,
+    required this.isFilled,
     required this.color,
   });
 
@@ -203,6 +219,9 @@ class HeartIcon extends StatelessWidget {
   Widget build(BuildContext context) {
     return Center(
       child: SvgPicture.asset(
+        // isFilled
+        //     ? 'assets/icons/heart_filled_icon.svg'
+        //     : 'assets/icons/heart_icon.svg',
         'assets/icons/heart_icon.svg',
         width: 24,
         height: 24,

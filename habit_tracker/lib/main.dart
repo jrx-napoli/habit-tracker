@@ -2,8 +2,41 @@ import 'package:flutter/material.dart';
 import 'home_page/home_page.dart';
 import 'nav_bar.dart';
 
-void main() {
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:google_sign_in/google_sign_in.dart';
+
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp();
+  User? user = await signInWithGoogle();
+  if (user != null) {
+    print('User signed in: ${user.displayName}');
+  }
   runApp(MyApp());
+}
+
+Future<User?> signInWithGoogle() async {
+  try {
+    final GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
+    if (googleUser == null) return null; // The user canceled the sign-in
+
+    final GoogleSignInAuthentication googleAuth =
+        await googleUser.authentication;
+
+    final credential = GoogleAuthProvider.credential(
+      accessToken: googleAuth.accessToken,
+      idToken: googleAuth.idToken,
+    );
+
+    final UserCredential userCredential =
+        await FirebaseAuth.instance.signInWithCredential(credential);
+
+    return userCredential.user; // User is successfully signed in
+  } catch (e) {
+    print('Error signing in with Google: $e');
+    return null;
+  }
 }
 
 class MyApp extends StatefulWidget {

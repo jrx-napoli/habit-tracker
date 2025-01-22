@@ -5,6 +5,9 @@ import 'habit_card.dart';
 import 'category_tab.dart';
 import '../habit_form/add_habit_form.dart';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
 
@@ -13,41 +16,89 @@ class HomePage extends StatefulWidget {
 }
 
 class HomePageState extends State<HomePage> {
+  final FirebaseFirestore firestore = FirebaseFirestore.instance;
+  final FirebaseAuth auth = FirebaseAuth.instance;
+
+  List<Map<String, dynamic>> habits = []; // List to store habits
+
+  @override
+  void initState() {
+    super.initState();
+    fetchHabits(); // Fetch habits when the widget is initialized
+  }
+
+  Future<void> fetchHabits() async {
+    try {
+      final User? user = auth.currentUser; // Get the logged-in user
+      if (user == null) throw Exception("User not logged in");
+
+      // Reference to the user's habits collection
+      final habitsSnapshot = await firestore
+          .collection('users')
+          .doc(user.uid)
+          .collection('habits')
+          .get();
+
+      // Convert the fetched documents into a list of maps
+      final fetchedHabits = habitsSnapshot.docs
+          .map((doc) => {
+                'id': doc.id, // Include the document ID
+                ...doc.data(), // Include all other data
+              })
+          .toList();
+
+      // Update the state with the fetched habits
+      setState(() {
+        habits = fetchedHabits;
+      });
+
+      print("Habits fetched: $habits");
+    } catch (e) {
+      print("Error fetching habits: $e");
+    }
+  }
+
   // Temporary hard coded list of habits for prototyping purposes
-  List<Map<String, dynamic>> habits = [
-    {
-      "title": "Drink water",
-      "category": "Health",
-      "streak": "21 days streak",
-      "progress": 3,
-      "goal": 8,
-      "status": "3/8",
-      "colorA": AppColors.blueA,
-      "colorB": AppColors.blueB,
-    },
-    {
-      "title": "Read",
-      "category": "Literature",
-      "streak": "13 days streak",
-      "progress": 0,
-      "goal": 1,
-      "status": "Pending",
-      "colorA": AppColors.purpleA,
-      "colorB": AppColors.purpleB,
-    },
-    {
-      "title": "Practice piano",
-      "category": "Music",
-      "streak": "7 weeks streak",
-      "progress": 1,
-      "goal": 1,
-      "status": "Done",
-      "colorA": AppColors.pinkA,
-      "colorB": AppColors.pinkB,
-    },
-  ];
+  // List<Map<String, dynamic>> habits = [
+  //   {
+  //     "title": "Drink water",
+  //     "category": "Health",
+  //     "streak": "21 days streak",
+  //     "progress": 3,
+  //     "goal": 8,
+  //     "status": "3/8",
+  //     "colorA": AppColors.blueA,
+  //     "colorB": AppColors.blueB,
+  //     "isFavorite": true
+  //   },
+  //   {
+  //     "title": "Read",
+  //     "category": "Literature",
+  //     "streak": "13 days streak",
+  //     "progress": 0,
+  //     "goal": 1,
+  //     "status": "Pending",
+  //     "colorA": AppColors.purpleA,
+  //     "colorB": AppColors.purpleB,
+  //     "isFavorite": false
+  //   },
+  //   {
+  //     "title": "Practice piano",
+  //     "category": "Music",
+  //     "streak": "7 weeks streak",
+  //     "progress": 1,
+  //     "goal": 1,
+  //     "status": "Done",
+  //     "colorA": AppColors.pinkA,
+  //     "colorB": AppColors.pinkB,
+  //     "isFavorite": false
+  //   },
+  // ];
 
   String selectedCategory = "All"; // Track the selected category
+
+  // final FirebaseFirestore firestore = FirebaseFirestore.instance;
+  // final FirebaseAuth auth = FirebaseAuth.instance;
 
   void updateProgress(int index, int change) {
     setState(() {
@@ -65,8 +116,29 @@ class HomePageState extends State<HomePage> {
         } else {
           habits[index]['status'] = "$newProgress/${habits[index]['goal']}";
         }
+
+        updateHabit(habits[index]['id'], newProgress);
       }
     });
+  }
+
+  Future<void> updateHabit(String habitId, int newProgress) async {
+    try {
+      final User? user = auth.currentUser;
+      if (user == null) throw Exception("User not logged in");
+
+      // Update the progress field
+      await firestore
+          .collection('users')
+          .doc(user.uid)
+          .collection('habits')
+          .doc(habitId)
+          .update({"progress": newProgress});
+
+      print("Habit updated successfully!");
+    } catch (e) {
+      print("Error updating habit: $e");
+    }
   }
 
   List<String> getCategories() {
@@ -212,16 +284,23 @@ class HomePageState extends State<HomePage> {
                   return Column(
                     children: [
                       HabitCard(
-                        title: habit['title'],
+                        id: habit['id'],
+                        title: habit['activity'],
                         category: habit['category'],
-                        streak: habit['streak'],
+                        streak: habit['streak'].toString(),
                         progress: habit['progress'],
                         goal: habit['goal'],
-                        status: habit['status'],
-                        colorA: habit['colorA'],
-                        colorB: habit['colorB'],
+                        status: "${habit['progress']}/${habit['goal']}",
+                        colorA: AppColors.gradients[(2 * index) % 6],
+                        colorB: AppColors.gradients[(2 * index + 1) % 6],
                         onProgressChange: (change) =>
                             updateProgress(index, change),
+                        isFavorite: habit['isFavorite'],
+                        onFavoriteToggle: () {
+                          setState(() {
+                            habit['isFavorite'] = !habit['isFavorite'];
+                          });
+                        },
                       ),
                       SizedBox(height: 16)
                     ],

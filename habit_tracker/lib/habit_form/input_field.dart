@@ -4,8 +4,11 @@ import '../constants/app_colors.dart';
 
 class InputField extends StatelessWidget {
   final String label;
+  final String? initialText;
+  final TextEditingController? controller;
 
-  const InputField({super.key, required this.label});
+  const InputField(
+      {super.key, required this.label, this.controller, this.initialText});
 
   @override
   Widget build(BuildContext context) {
@@ -21,6 +24,7 @@ class InputField extends StatelessWidget {
           ],
         ),
         child: TextField(
+          controller: controller,
           style: TextStyle(
             fontFamily: 'Inter',
             fontSize: 16,
@@ -36,6 +40,7 @@ class InputField extends StatelessWidget {
                 fontWeight: FontWeight.w500,
                 color: AppColors.lightGrey),
             hintText: label,
+            labelText: initialText,
             filled: true,
             fillColor: Colors.white,
             border: OutlineInputBorder(
