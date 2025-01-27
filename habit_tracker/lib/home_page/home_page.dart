@@ -58,47 +58,7 @@ class HomePageState extends State<HomePage> {
     }
   }
 
-  // Temporary hard coded list of habits for prototyping purposes
-  // List<Map<String, dynamic>> habits = [
-  //   {
-  //     "title": "Drink water",
-  //     "category": "Health",
-  //     "streak": "21 days streak",
-  //     "progress": 3,
-  //     "goal": 8,
-  //     "status": "3/8",
-  //     "colorA": AppColors.blueA,
-  //     "colorB": AppColors.blueB,
-  //     "isFavorite": true
-  //   },
-  //   {
-  //     "title": "Read",
-  //     "category": "Literature",
-  //     "streak": "13 days streak",
-  //     "progress": 0,
-  //     "goal": 1,
-  //     "status": "Pending",
-  //     "colorA": AppColors.purpleA,
-  //     "colorB": AppColors.purpleB,
-  //     "isFavorite": false
-  //   },
-  //   {
-  //     "title": "Practice piano",
-  //     "category": "Music",
-  //     "streak": "7 weeks streak",
-  //     "progress": 1,
-  //     "goal": 1,
-  //     "status": "Done",
-  //     "colorA": AppColors.pinkA,
-  //     "colorB": AppColors.pinkB,
-  //     "isFavorite": false
-  //   },
-  // ];
-
   String selectedCategory = "All"; // Track the selected category
-
-  // final FirebaseFirestore firestore = FirebaseFirestore.instance;
-  // final FirebaseAuth auth = FirebaseAuth.instance;
 
   void updateProgress(int index, int change) {
     setState(() {
@@ -107,22 +67,26 @@ class HomePageState extends State<HomePage> {
       // Ensure progress stays within valid bounds
       if (newProgress >= 0 && newProgress <= habits[index]['goal']) {
         habits[index]['progress'] = newProgress;
-
+        String status = "";
         // Update the displayed status
         if (newProgress == habits[index]['goal']) {
+          status = "Done";
           habits[index]['status'] = "Done";
         } else if (newProgress == 0) {
+          status = "Pending";
           habits[index]['status'] = "Pending";
         } else {
+          status = "$newProgress/${habits[index]['goal']}";
           habits[index]['status'] = "$newProgress/${habits[index]['goal']}";
         }
 
-        updateHabit(habits[index]['id'], newProgress);
+        updateHabit(habits[index]['id'], newProgress, status);
       }
     });
   }
 
-  Future<void> updateHabit(String habitId, int newProgress) async {
+  Future<void> updateHabit(
+      String habitId, int newProgress, String status) async {
     try {
       final User? user = auth.currentUser;
       if (user == null) throw Exception("User not logged in");
@@ -133,7 +97,7 @@ class HomePageState extends State<HomePage> {
           .doc(user.uid)
           .collection('habits')
           .doc(habitId)
-          .update({"progress": newProgress});
+          .update({"progress": newProgress, "status": status});
 
       print("Habit updated successfully!");
     } catch (e) {
@@ -227,8 +191,8 @@ class HomePageState extends State<HomePage> {
                       color: AppColors.darkGrey),
                 ),
                 TextButton(
-                  onPressed: () {
-                    showModalBottomSheet(
+                  onPressed: () async {
+                    final shouldRefresh = showModalBottomSheet<bool>(
                       context: context,
                       isScrollControlled:
                           true, // Allows the modal to expand fully
@@ -238,6 +202,12 @@ class HomePageState extends State<HomePage> {
                         return AddHabitForm();
                       },
                     );
+
+                    if (shouldRefresh == true) {
+                      setState(() {
+                        fetchHabits();
+                      });
+                    }
                   }, // Add habit functionality
                   child: Text(
                     "Add habit",

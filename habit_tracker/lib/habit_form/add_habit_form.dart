@@ -118,14 +118,15 @@ class _AddHabitFormState extends State<AddHabitForm> {
                                 : int.parse(reachCountController.text),
                             "createdAt": FieldValue.serverTimestamp(),
                             "isFavorite": false,
-                            "streak": 0
+                            "streak": 0,
+                            "status": "Pending"
                           };
 
                           // Save the habit to Firestore
                           await addHabit(habitData);
 
                           // Close the modal
-                          Navigator.of(context).pop(); // Close the modal
+                          Navigator.pop(context, true); // Close the modal
                         },
                         child: Text(
                           "Add",
